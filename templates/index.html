@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    
+    <title>Job Language Tracker</title>
+</head>
+<body>
+    <h1>Job Language Tracker</h1>
+
+    <form id="jobForm">
+        <label for="job_name">Job Name:</label>
+        <input type="text" id="job_name" name="job_name"><br><br>
+
+        <label for="languages">Languages (comma-separated):</label>
+        <input type="text" id="languages" name="languages"rows="20" cols="80"><br><br>
+
+        <input type="submit" value="Add Job">
+    </form>
+
+    <h2>Study Plan</h2>
+    <ul id="studyPlan">
+        <!-- Ranked languages will be displayed here -->
+    </ul>
+
+    <script>
+        document.getElementById('jobForm').onsubmit = function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(document.getElementById('jobForm'));
+
+            fetch('/add_job', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Languages frequency updated:', data);
+                updateStudyPlan();
+            });
+        };
+
+        function updateStudyPlan() {
+            fetch('/study_plan')
+            .then(response => response.json())
+            .then(data => {
+                const studyPlanElement = document.getElementById('studyPlan');
+                studyPlanElement.innerHTML = '';
+
+                data.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `${item[0]}: ${item[1]} times`;
+                    studyPlanElement.appendChild(li);
+                });
+            });
+        }
+
+        updateStudyPlan(); // Initial load
+    </script>
+</body>
+</html>
